@@ -10,14 +10,13 @@ class Correios
   @url_rastreamento = "#{@url}/sro_bin/txect01$.QueryList?P_ITEMCODE=&P_LINGUA=001&P_TESTE=&P_TIPO=001&P_COD_UNI="
   
   def self.encomenda(numero, url=@url_rastreamento)
-    i = Iconv.new('UTF-8','LATIN1')
     html = Hpricot(open("#{url}#{numero}"))
     encomenda = Encomenda.new(numero)
     
     pula_tr = true
     (html/"tr").each do |tr|
        status = nil
-       status = self.parse_tr(encomenda, i.iconv(tr)) if not pula_tr
+       status = self.parse_tr(encomenda, tr) if not pula_tr
        encomenda << status if not status.nil?
        pula_tr = false
     end
@@ -26,6 +25,7 @@ class Correios
   
   private
   def self.parse_tr(encomenda, tr)
+    i = Iconv.new('UTF-8','LATIN1')
     status = nil
     td_count = 0
     (tr/"td").each do |td|
@@ -42,8 +42,8 @@ class Correios
 
       status.local = td.inner_html if td_count == 1
       if td_count == 2
-        parsed_situacao = td.inner_html.scan(/.*>(.*)<.*/)
-        status.situacao = parsed_situacao[0][0]
+        parsed_situacao = i.iconv(td.inner_html.scan(/.*>(.*)<.*/))
+        status.situacao = i.iconv(parsed_situacao[0][0])
       end
 
       td_count += 1
