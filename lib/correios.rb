@@ -3,19 +3,21 @@ require "hpricot"
 require "open-uri"
 require "encomenda"
 require "encomenda_status"
+require 'iconv'
 
 class Correios
   @url = "http://websro.correios.com.br"
   @url_rastreamento = "#{@url}/sro_bin/txect01$.QueryList?P_ITEMCODE=&P_LINGUA=001&P_TESTE=&P_TIPO=001&P_COD_UNI="
   
   def self.encomenda(numero, url=@url_rastreamento)
+    i = Iconv.new('UTF-8','LATIN1')
     html = Hpricot(open("#{url}#{numero}"))
     encomenda = Encomenda.new(numero)
     
     pula_tr = true
     (html/"tr").each do |tr|
        status = nil
-       status = self.parse_tr(encomenda, tr) if not pula_tr
+       status = self.parse_tr(encomenda, i.iconv(tr)) if not pula_tr
        encomenda << status if not status.nil?
        pula_tr = false
     end
