@@ -42,7 +42,7 @@ class Correios
 
       status.local = td.inner_html if td_count == 1
       if td_count == 2
-        parsed_situacao = i.iconv(td.inner_html.scan(/.*>(.*)<.*/))
+        parsed_situacao = td.inner_html.scan(/.*>(.*)<.*/)
         status.situacao = i.iconv(parsed_situacao[0][0])
       end
 
