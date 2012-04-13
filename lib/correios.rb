@@ -36,11 +36,11 @@ class Correios
           timestamp = parsed_data[0][2] + parsed_data[0][1] + parsed_data[0][0] + parsed_data[0][3] + parsed_data[0][4] + "00"
           status.data = DateTime.parse(timestamp)
         else
-          encomenda.primeiro_status_disponivel.detalhes = td.inner_html
+          encomenda.primeiro_status_disponivel.detalhes = i.iconv(td.inner_html)
         end
       end
 
-      status.local = td.inner_html if td_count == 1
+      status.local = i.iconv(td.inner_html) if td_count == 1
       if td_count == 2
         parsed_situacao = td.inner_html.scan(/.*>(.*)<.*/)
         status.situacao = i.iconv(parsed_situacao[0][0])
